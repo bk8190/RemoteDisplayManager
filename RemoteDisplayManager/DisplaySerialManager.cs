@@ -15,14 +15,44 @@ namespace RemoteDisplayManager
             return "<l" + state + ">";
         }
 
-        public static String TextLine1Command(String text)
+        public static String TextCommand(String text, int row=0, int col=0)
         {
-            return "<t" + text + ">";
+            text = text.Replace('<', '%');
+            text = text.Replace('>', '%');
+            if (text.Length > 16)
+                throw new Exception("Text too long");
+            if (row<0 && row>1)
+                throw new Exception("Valid rows: 0, 1");
+            if (col < 0 || col > 16)
+                throw new Exception("Valid cols are [0, 16]");
+
+            char rowc = (char)(97 + row);
+            char colc = (char)(97 + col);
+            return "<t" + rowc + colc + text + ">";
         }
 
-        public static String TextLine2Command(String text)
+        public static String QuickTextCommand(String text)
         {
+            text = text.Replace('<', '%');
+            text = text.Replace('>', '%');
+            if (text.Length > 16)
+                throw new Exception("Text too long");
+
             return "<u" + text + ">";
+        }
+
+        public static String ClearCommand(int row=3)
+        {
+            if (row == 0)
+                return "<ca>";
+            if (row == 1)
+                return "<cb>";
+            return "<c>";
+        }
+
+        public static String PingCommand()
+        {
+            return "<e>";
         }
     }
 

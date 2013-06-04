@@ -7,3 +7,12 @@ c:\users\bill\documents\visual studio 2012\Projects\RemoteDisplayManager\RemoteD
 c:\users\bill\documents\visual studio 2012\Projects\RemoteDisplayManager\RemoteDisplayManager\obj\Debug\RemoteDisplayManager.csproj.GenerateResource.Cache
 c:\users\bill\documents\visual studio 2012\Projects\RemoteDisplayManager\RemoteDisplayManager\obj\Debug\RemoteDisplayManager.exe
 c:\users\bill\documents\visual studio 2012\Projects\RemoteDisplayManager\RemoteDisplayManager\obj\Debug\RemoteDisplayManager.pdb
+C:\Users\wkulp\Documents\GitHub\RemoteDisplayManager\RemoteDisplayManager\bin\Debug\RemoteDisplayManager.exe.config
+C:\Users\wkulp\Documents\GitHub\RemoteDisplayManager\RemoteDisplayManager\obj\Debug\RemoteDisplayManager.exe
+C:\Users\wkulp\Documents\GitHub\RemoteDisplayManager\RemoteDisplayManager\obj\Debug\RemoteDisplayManager.pdb
+C:\Users\wkulp\Documents\GitHub\RemoteDisplayManager\RemoteDisplayManager\bin\Debug\RemoteDisplayManager.exe
+C:\Users\wkulp\Documents\GitHub\RemoteDisplayManager\RemoteDisplayManager\bin\Debug\RemoteDisplayManager.pdb
+C:\Users\wkulp\Documents\GitHub\RemoteDisplayManager\RemoteDisplayManager\obj\Debug\RemoteDisplayManager.csprojResolveAssemblyReference.cache
+C:\Users\wkulp\Documents\GitHub\RemoteDisplayManager\RemoteDisplayManager\obj\Debug\RemoteDisplayManager.Form1.resources
+C:\Users\wkulp\Documents\GitHub\RemoteDisplayManager\RemoteDisplayManager\obj\Debug\RemoteDisplayManager.Properties.Resources.resources
+C:\Users\wkulp\Documents\GitHub\RemoteDisplayManager\RemoteDisplayManager\obj\Debug\RemoteDisplayManager.csproj.GenerateResource.Cache

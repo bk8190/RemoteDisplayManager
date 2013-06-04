@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO.Ports;
 using System.Linq;
@@ -102,36 +103,74 @@ namespace RemoteDisplayManager
             {
                 try
                 {
-                    string newstatus = MXIEScraper.GetStatus();
+                    Image img = MXIEScraper.GetStatusImage();
+                    mxiePicture.Image = img;
+                    img.Save(@"C:\Windows\Temp\mxieimage.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
+
+                    var p = new Process();
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.RedirectStandardOutput = true;
+                    p.StartInfo.CreateNoWindow = true;
+                    p.StartInfo.FileName = "tesseract";
+                    p.StartInfo.Arguments = @"C:\Windows\Temp\mxieimage.bmp C:\Windows\Temp\mxietext -l eng";
+                    p.Start();
+                    p.WaitForExit();
+
+                    string newstatus = System.IO.File.ReadAllText(@"C:\Windows\Temp\mxietext.txt");
                     StatusCurrentTextBox.Text = newstatus;
                     setStatus(newstatus);
                 }
                 catch (Exception ex)
                 {
-                    StatusCurrentTextBox.Text = ex.ToString();
+                    System.Console.WriteLine(ex.ToString());
+                    StatusCurrentTextBox.Text = "ERROR: " + ex.Message;// ToString();
                 }
             }
         }
 
         private void setStatus(String newstatus)
         {
-            if (connected)
+            //if (connected)
             {
                 if (newstatus != lastStatus)
                 {
                     lastStatus = newstatus;
 
-                    var result = Regex.Split(newstatus, "\r\n|\r|\n");
+                    var text = newstatus.Replace('\n', ' ').Replace('\r', ' ');
 
-                    if (result.Length > 0)
+                    var words = text.Split(' ');
+                    var result = new List<string>();
+                    result.Add("");
+                    var idx = 0;
+
+                    foreach (var word in words)
                     {
-                        Console.WriteLine("Line 0: " + result[0]);
-                        dsm.write(Commands.QuickTextCommand(result[0]));
+                        if (word == "")
+                            continue;
+
+                        Console.WriteLine("word: <" + word + ">");
+                        if (result[idx].Length + word.Length + 1 <= 16)
+                        {
+                            if (result[idx].Length > 0)
+                                result[idx] += " ";
+                            result[idx] += word;
+                        }
+                        else
+                        {
+                            idx++;
+                            result.Add(word);
+                        }
                     }
-                    if (result.Length > 1)
+
+                    if (result.Count > 0)
                     {
-                        Console.WriteLine("Line 1: " + result[1]);
-                        dsm.write(Commands.TextCommand(result[1], 1));
+                        Console.WriteLine("Line 0: <" + result[0] + ">");
+                       // dsm.write(Commands.QuickTextCommand(result[0]));
+                    }
+                    if (result.Count > 1)
+                    {
+                        Console.WriteLine("Line 1: <" + result[1] + ">");
+                       // dsm.write(Commands.TextCommand(result[1], 1));
                     }
 
                     //Console.WriteLine("New status: " + newstatus);

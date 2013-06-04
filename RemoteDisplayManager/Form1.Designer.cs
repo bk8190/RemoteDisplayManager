@@ -43,6 +43,9 @@
             this.connectionTimeoutTimer = new System.Windows.Forms.Timer(this.components);
             this.button2 = new System.Windows.Forms.Button();
             this.pingTimer = new System.Windows.Forms.Timer(this.components);
+            this.mxiePicture = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.mxiePicture)).BeginInit();
             this.SuspendLayout();
             // 
             // connectButton
@@ -72,7 +75,7 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(12, 147);
+            this.textBox1.Location = new System.Drawing.Point(12, 194);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(249, 22);
             this.textBox1.TabIndex = 3;
@@ -80,7 +83,7 @@
             // StatusCurrentTextBox
             // 
             this.StatusCurrentTextBox.Enabled = false;
-            this.StatusCurrentTextBox.Location = new System.Drawing.Point(12, 70);
+            this.StatusCurrentTextBox.Location = new System.Drawing.Point(12, 100);
             this.StatusCurrentTextBox.Multiline = true;
             this.StatusCurrentTextBox.Name = "StatusCurrentTextBox";
             this.StatusCurrentTextBox.Size = new System.Drawing.Size(268, 42);
@@ -89,7 +92,7 @@
             // button1
             // 
             this.button1.Enabled = false;
-            this.button1.Location = new System.Drawing.Point(12, 118);
+            this.button1.Location = new System.Drawing.Point(12, 165);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(90, 23);
             this.button1.TabIndex = 4;
@@ -99,7 +102,7 @@
             // 
             // rawResponsesTextBox
             // 
-            this.rawResponsesTextBox.Location = new System.Drawing.Point(12, 263);
+            this.rawResponsesTextBox.Location = new System.Drawing.Point(12, 268);
             this.rawResponsesTextBox.Multiline = true;
             this.rawResponsesTextBox.Name = "rawResponsesTextBox";
             this.rawResponsesTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -119,10 +122,11 @@
             "blue",
             "violet",
             "white"});
-            this.backlightBox.Location = new System.Drawing.Point(12, 199);
+            this.backlightBox.Location = new System.Drawing.Point(84, 238);
             this.backlightBox.Name = "backlightBox";
             this.backlightBox.Size = new System.Drawing.Size(121, 24);
             this.backlightBox.TabIndex = 6;
+            this.backlightBox.Text = "off";
             this.backlightBox.SelectedIndexChanged += new System.EventHandler(this.changeBacklight);
             // 
             // mxieCheckBox
@@ -150,7 +154,7 @@
             // mxieTimer
             // 
             this.mxieTimer.Enabled = true;
-            this.mxieTimer.Interval = 5000;
+            this.mxieTimer.Interval = 1000;
             this.mxieTimer.Tick += new System.EventHandler(this.mxieTimerCallback);
             // 
             // connectionTimeoutTimer
@@ -162,7 +166,7 @@
             // button2
             // 
             this.button2.Enabled = false;
-            this.button2.Location = new System.Drawing.Point(108, 118);
+            this.button2.Location = new System.Drawing.Point(108, 165);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(90, 23);
             this.button2.TabIndex = 4;
@@ -176,11 +180,31 @@
             this.pingTimer.Interval = 5000;
             this.pingTimer.Tick += new System.EventHandler(this.pingTimerCallback);
             // 
+            // mxiePicture
+            // 
+            this.mxiePicture.Location = new System.Drawing.Point(12, 70);
+            this.mxiePicture.Name = "mxiePicture";
+            this.mxiePicture.Size = new System.Drawing.Size(268, 27);
+            this.mxiePicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.mxiePicture.TabIndex = 9;
+            this.mxiePicture.TabStop = false;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(13, 241);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(65, 17);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "Backlight";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 449);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.mxiePicture);
             this.Controls.Add(this.connectedBox);
             this.Controls.Add(this.mxieCheckBox);
             this.Controls.Add(this.backlightBox);
@@ -193,6 +217,7 @@
             this.Controls.Add(this.connectButton);
             this.Name = "Form1";
             this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.mxiePicture)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -214,6 +239,8 @@
         private System.Windows.Forms.Timer connectionTimeoutTimer;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Timer pingTimer;
+        private System.Windows.Forms.PictureBox mxiePicture;
+        private System.Windows.Forms.Label label1;
     }
 }
 

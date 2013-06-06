@@ -105,18 +105,8 @@ namespace RemoteDisplayManager
                 {
                     Image img = MXIEScraper.GetStatusImage();
                     mxiePicture.Image = img;
-                    img.Save(@"C:\Windows\Temp\mxieimage.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
+                    String newstatus = MXIEScraper.ExtractStatus(img);
 
-                    var p = new Process();
-                    p.StartInfo.UseShellExecute = false;
-                    p.StartInfo.RedirectStandardOutput = true;
-                    p.StartInfo.CreateNoWindow = true;
-                    p.StartInfo.FileName = "tesseract";
-                    p.StartInfo.Arguments = @"C:\Windows\Temp\mxieimage.bmp C:\Windows\Temp\mxietext -l eng";
-                    p.Start();
-                    p.WaitForExit();
-
-                    string newstatus = System.IO.File.ReadAllText(@"C:\Windows\Temp\mxietext.txt");
                     StatusCurrentTextBox.Text = newstatus;
                     setStatus(newstatus);
                 }

@@ -28,6 +28,8 @@ namespace RemoteDisplayManager
             cbidx = 0;
 
             InitializeComponent();
+
+            portBoxDropDown(null, null);
         }
 
         private void portBoxDropDown(object sender, EventArgs e)
@@ -44,9 +46,10 @@ namespace RemoteDisplayManager
                 {
                     dsm.open(serialPortBox.Text);
                     connected = true;
+
                     serialPortBox.Enabled = false;
-                    button1.Enabled = true;
-                    button2.Enabled = true;
+                    button1.Enabled       = true;
+                    button2.Enabled       = true;
                     backlightBox.Enabled  = true;
                 }
                 catch (Exception ex)
@@ -57,9 +60,10 @@ namespace RemoteDisplayManager
             else
             {
                 connected = false;
+
                 serialPortBox.Enabled = true;
-                button1.Enabled = false;
-                button2.Enabled = false;
+                button1.Enabled       = false;
+                button2.Enabled       = false;
                 backlightBox.Enabled  = false;
 
                 dsm.close();
@@ -75,21 +79,32 @@ namespace RemoteDisplayManager
                 if (dsm.responses.Count > 0)
                 {
                     String s = (String)dsm.responses.Dequeue();
-                    
-                    rawResponsesTextBox.Text += s + "\r\n";
 
                     // We got a response from the device. Reset the timeout timer
                     connectedBox.Checked = true;
                     connectionTimeoutTimer.Stop();
                     connectionTimeoutTimer.Start();
-                    
-                    if (s.StartsWith("e"))
-                        Console.WriteLine("Got ping");
-                    
-                    if (s.StartsWith("u"))
+
+                    switch (s[0])
                     {
-                        Console.WriteLine("Got: set status \"" + s.Substring(1) + "\"");
-                        MXIEScraper.SetStatus(s.Substring(1));
+                        case 'e':
+                            Console.WriteLine("Got ping");
+                            break;
+
+                        case 'u':
+                            String status = s.Substring(1);
+                            Console.WriteLine("Got: set status \"" + status + "\"");
+                            MXIEScraper.SetStatus(status);
+                            break;
+
+                        case 'h':
+                            String voltage = s.Substring(1);
+                            Console.WriteLine("Got heartbeat: " + s + ", voltage = " + voltage);
+                            break;
+
+                        default:
+                            rawResponsesTextBox.Text += s + "\r\n";
+                            break;
                     }
                 }
             }
@@ -157,16 +172,20 @@ namespace RemoteDisplayManager
                     if (result.Count > 0)
                     {
                         Console.WriteLine("Line 0: <" + result[0] + ">");
-                       // dsm.write(Commands.QuickTextCommand(result[0]));
+                        // dsm.write(Commands.QuickTextCommand(result[0]));
+
+                        if (result.Count > 1)
+                        {
+                            Console.WriteLine("Line 1: <" + result[1] + ">");
+                            // dsm.write(Commands.TextCommand(result[1], 1));
+                        }
                     }
-                    if (result.Count > 1)
+                    else
                     {
-                        Console.WriteLine("Line 1: <" + result[1] + ">");
-                       // dsm.write(Commands.TextCommand(result[1], 1));
+                        Console.WriteLine("Clearing");
+                        dsm.write(Commands.ClearCommand());
                     }
 
-                    //Console.WriteLine("New status: " + newstatus);
-                    //dsm.write(Commands.QuickTextCommand(newstatus));
                 }
             }
         }

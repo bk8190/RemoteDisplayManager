@@ -18,17 +18,14 @@ namespace RemoteDisplayManager
         private bool connected;
         private string lastStatus;
         private DisplaySerialManager dsm;
-        private int cbidx;
 
         public Form1()
         {
             connected = false;
             lastStatus = "";
             dsm = new DisplaySerialManager();
-            cbidx = 0;
 
             InitializeComponent();
-
             portBoxDropDown(null, null);
         }
 
@@ -94,7 +91,10 @@ namespace RemoteDisplayManager
                         case 'u':
                             String status = s.Substring(1);
                             Console.WriteLine("Got: set status \"" + status + "\"");
+
                             MXIEScraper.SetStatus(status);
+                            lastStatus = getStatusFromMXIE();
+                            Console.WriteLine("After OCR, new status is \"" + lastStatus + "\"");
                             break;
 
                         case 'h':
@@ -103,6 +103,7 @@ namespace RemoteDisplayManager
                             break;
 
                         default:
+                            Console.WriteLine("Unknown: <" + s + ">");
                             rawResponsesTextBox.Text += s + "\r\n";
                             break;
                     }
@@ -110,22 +111,22 @@ namespace RemoteDisplayManager
             }
         }
 
+        private String getStatusFromMXIE()
+        {
+            Image img = MXIEScraper.GetStatusImage();
+            mxiePicture.Image = img;
+            return MXIEScraper.ExtractStatus(img);
+        }
+
 
         private void mxieTimerCallback(object sender, EventArgs e)
         {
-            // Update the MXIE status
             if (mxieCheckBox.Checked)
             {
                 try
                 {
-                    Image img = MXIEScraper.GetStatusImage();
-                    mxiePicture.Image = img;
-                    String newstatus = MXIEScraper.ExtractStatus(img);
-
-                    StatusCurrentTextBox.Text = newstatus;
-                    setStatus(newstatus);
-
-                    MXIEScraper.SetStatus("Hello world");
+                    setStatus(getStatusFromMXIE());
+                    //MXIEScraper.SetStatus("Hello world");
                 }
                 catch (Exception ex)
                 {
@@ -142,69 +143,19 @@ namespace RemoteDisplayManager
                 if (newstatus != lastStatus)
                 {
                     lastStatus = newstatus;
+                    StatusCurrentTextBox.Text = newstatus;
 
-                    var text = newstatus.Replace('\n', ' ').Replace('\r', ' ');
-
-                    var words = text.Split(' ');
-                    var result = new List<string>();
-                    result.Add("");
-                    var idx = 0;
-
-                    foreach (var word in words)
-                    {
-                        if (word == "")
-                            continue;
-
-                        Console.WriteLine("word: <" + word + ">");
-                        if (result[idx].Length + word.Length + 1 <= 16)
-                        {
-                            if (result[idx].Length > 0)
-                                result[idx] += " ";
-                            result[idx] += word;
-                        }
-                        else
-                        {
-                            idx++;
-                            result.Add(word);
-                        }
-                    }
-
-                    if (result.Count > 0)
-                    {
-                        Console.WriteLine("Line 0: <" + result[0] + ">");
-                        // dsm.write(Commands.QuickTextCommand(result[0]));
-
-                        if (result.Count > 1)
-                        {
-                            Console.WriteLine("Line 1: <" + result[1] + ">");
-                            // dsm.write(Commands.TextCommand(result[1], 1));
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Clearing");
-                        dsm.write(Commands.ClearCommand());
-                    }
-
+                    var cmd = Commands.SetTextCompositeCommand(newstatus);
+                    //dsm.write(cmd);
                 }
             }
         }
 
-        private void copyStatus(object sender, EventArgs e)
-        {
-            setStatus(textBox1.Text);
-        }
-
-        private void sendRaw(object sender, EventArgs e)
-        {
-            dsm.write(textBox1.Text);
-        }
 
         private void changeBacklight(object sender, EventArgs e)
         {
             Console.WriteLine("Set backlight: " + backlightBox.Text);
-            var s = Commands.BacklightCommand(backlightBox.Text);
-            dsm.write(s);
+            dsm.write(Commands.BacklightCommand(backlightBox.Text));
         }
 
         // When this timeout expires, we are no longer connected to the device
@@ -213,15 +164,14 @@ namespace RemoteDisplayManager
             connectedBox.Checked = false;
         }
 
-        // Send a ping every 5 seconds
-        private void pingTimerCallback(object sender, EventArgs e)
+        private void setStatusButtonClick(object sender, EventArgs e)
         {
-            if (connected)
-            {
-                Console.WriteLine("Sending ping");
-                dsm.write(Commands.PingCommand());
-            }
+            setStatus(textBox1.Text);
         }
 
+        private void sendRawButtonClick(object sender, EventArgs e)
+        {
+            dsm.write(textBox1.Text);
+        }
     }
 }

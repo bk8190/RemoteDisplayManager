@@ -71,30 +71,29 @@ namespace RemoteDisplayManager
 
             if (win_main == IntPtr.Zero)
                 throw new System.Exception("Null window");
-
+            // Console.WriteLine("Top window = 0x" + win_main.ToString("X"));
             return win_main;
         }
 
-        private static IntPtr GetStatusControl(IntPtr win_main)
+        private static IntPtr GetMXIEStatusControl()
         {
-            // Console.WriteLine("Top window = 0x" + win_main.ToString("X"));
-            
-            IntPtr child = Win32.FindWindowEx(win_main, IntPtr.Zero, null, null);
+            IntPtr win_main = GetMXIEMainWindow();
+            IntPtr child1 = Win32.FindWindowEx(win_main, IntPtr.Zero, null, null);
             IntPtr child2 = IntPtr.Zero;
 
-            while (child != IntPtr.Zero)
+            while (child1 != IntPtr.Zero)
             {
-                Console.WriteLine("Child " + child.ToString("X"));
+                Console.WriteLine("Child " + child1.ToString("X"));
 
                 child2 = IntPtr.Zero;
-                child2 = Win32.FindWindowEx(child, child2, null, "toolBarPresenceNoteEdit");
+                child2 = Win32.FindWindowEx(child1, child2, null, "toolBarPresenceNoteEdit");
                 if (child2 != IntPtr.Zero)
                     break;
 
-                child = Win32.FindWindowEx(win_main, child, null, null);
+                child1 = Win32.FindWindowEx(win_main, child1, null, null);
             }
 
-            Console.WriteLine("Using: child = 0x"  + child.ToString("X"));
+            Console.WriteLine("Using: child1 = 0x" + child1.ToString("X"));
             Console.WriteLine("Using: child2 = 0x" + child2.ToString("X"));
 
             if (child2 == IntPtr.Zero)
@@ -105,21 +104,24 @@ namespace RemoteDisplayManager
 
         public static Image GetStatusImage()
         {
-            IntPtr win_main = GetMXIEMainWindow();
-
-            ScreenCapture sc = new ScreenCapture();
-            Image img = sc.CaptureWindow(win_main);
+            var win_main = GetMXIEMainWindow();
+            var img = (Bitmap) new ScreenCapture().CaptureWindow(win_main);
 
             // Crop the status box
-            int width = 350;
-            int height = 22;
-            Rectangle croprect = new Rectangle(95, 105, width, height);
-            Bitmap bmp = new Bitmap(img);
-            img = bmp.Clone(croprect, bmp.PixelFormat);
+            const int x0 = 95;
+            const int y0 = 105;
+            const int width  = 250;
+            const int height = 22;
+            var crop = new Rectangle(x0, y0, width, height);
+
+            if (img.Width < x0+width || img.Height < y0+height)
+                throw new System.Exception("Image too small to crop");
+
+            img = img.Clone(crop, img.PixelFormat);
 
             // Resize it to help with OCR
-            int newWidth  = img.Width *4;
-            int newHeight = img.Height *4;
+            int newWidth  = (int)(img.Width  * 5);
+            int newHeight = (int)(img.Height * 4);
             Bitmap newImage = new Bitmap(newWidth, newHeight);
             using (Graphics gr = Graphics.FromImage(newImage))
             {
@@ -144,14 +146,12 @@ namespace RemoteDisplayManager
             p.Start();
             p.WaitForExit();
 
-            string newstatus = System.IO.File.ReadAllText(@"C:\Windows\Temp\mxietext.txt");
-            return newstatus;
+            return System.IO.File.ReadAllText(@"C:\Windows\Temp\mxietext.txt");
         }
 
         public static void SetStatus(string status)
         {
             IntPtr win_main = GetMXIEMainWindow();
-
             Win32.SetForegroundWindow(win_main);
             System.Threading.Thread.Sleep(200);
 

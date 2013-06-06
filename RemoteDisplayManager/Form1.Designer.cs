@@ -42,7 +42,6 @@
             this.mxieTimer = new System.Windows.Forms.Timer(this.components);
             this.connectionTimeoutTimer = new System.Windows.Forms.Timer(this.components);
             this.button2 = new System.Windows.Forms.Button();
-            this.pingTimer = new System.Windows.Forms.Timer(this.components);
             this.mxiePicture = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.mxiePicture)).BeginInit();
@@ -98,7 +97,7 @@
             this.button1.TabIndex = 4;
             this.button1.Text = "Set status";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.copyStatus);
+            this.button1.Click += new System.EventHandler(this.setStatusButtonClick);
             // 
             // rawResponsesTextBox
             // 
@@ -172,20 +171,14 @@
             this.button2.TabIndex = 4;
             this.button2.Text = "Send raw";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.sendRaw);
-            // 
-            // pingTimer
-            // 
-            this.pingTimer.Enabled = true;
-            this.pingTimer.Interval = 5000;
-            this.pingTimer.Tick += new System.EventHandler(this.pingTimerCallback);
+            this.button2.Click += new System.EventHandler(this.sendRawButtonClick);
             // 
             // mxiePicture
             // 
             this.mxiePicture.Location = new System.Drawing.Point(12, 70);
             this.mxiePicture.Name = "mxiePicture";
             this.mxiePicture.Size = new System.Drawing.Size(268, 27);
-            this.mxiePicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.mxiePicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.mxiePicture.TabIndex = 9;
             this.mxiePicture.TabStop = false;
             // 
@@ -238,7 +231,6 @@
         private System.Windows.Forms.Timer mxieTimer;
         private System.Windows.Forms.Timer connectionTimeoutTimer;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Timer pingTimer;
         private System.Windows.Forms.PictureBox mxiePicture;
         private System.Windows.Forms.Label label1;
     }

@@ -54,6 +54,55 @@ namespace RemoteDisplayManager
         {
             return "<e>";
         }
+
+        public static String SetTextCompositeCommand(String status)
+        {
+            var words = status.Replace('\n', ' ').Replace('\r', ' ').Split(' ');
+            
+            var result = new List<string>();
+            result.Add("");
+
+            var idx = 0;
+            var output = "";
+
+            foreach (var word in words)
+            {
+                if (word == "")
+                    continue;
+
+                Console.WriteLine("word: <" + word + ">");
+                if (result[idx].Length + word.Length + 1 <= 16)
+                {
+                    if (result[idx].Length > 0)
+                        result[idx] += " ";
+                    result[idx] += word;
+                }
+                else
+                {
+                    idx++;
+                    result.Add(word);
+                }
+            }
+
+            if (result.Count > 0)
+            {
+                Console.WriteLine("Line 0: <" + result[0] + ">");
+                output += Commands.QuickTextCommand(result[0]);
+
+                if (result.Count > 1)
+                {
+                    Console.WriteLine("Line 1: <" + result[1] + ">");
+                    output += Commands.TextCommand(result[1], 1);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Clearing");
+                output += Commands.ClearCommand();
+            }
+            Console.WriteLine("Composite command: " + output);
+            return output;
+        }
     }
 
     class DisplaySerialManager
@@ -122,7 +171,6 @@ namespace RemoteDisplayManager
                     }
                     else if (c == '>')
                     {
-                        //System.Console.WriteLine("Command: %" + incomplete_string + "%");
                         responses.Enqueue(incomplete_string);
                         got_start_delim = false;
                     }

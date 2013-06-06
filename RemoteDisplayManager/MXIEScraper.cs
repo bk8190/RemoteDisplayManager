@@ -21,7 +21,7 @@ namespace RemoteDisplayManager
             [DllImport("user32.dll")]
             public static extern IntPtr FindWindowEx(IntPtr Parent, IntPtr child, string classname, string WindowTitle);
             [DllImport("User32.dll")]
-            public static extern Int32 SetForegroundWindow(int hWnd);
+            public static extern Int32 SetForegroundWindow(IntPtr hWnd);
             //[DllImport("User32.dll")]
             //public static extern Boolean EnumChildWindows(int hWndParent, Delegate lpEnumFunc, int lParam);
             //[DllImport("User32.dll")]
@@ -118,8 +118,8 @@ namespace RemoteDisplayManager
             img = bmp.Clone(croprect, bmp.PixelFormat);
 
             // Resize it to help with OCR
-            int newWidth  = img.Width *3;
-            int newHeight = img.Height *3;
+            int newWidth  = img.Width *4;
+            int newHeight = img.Height *4;
             Bitmap newImage = new Bitmap(newWidth, newHeight);
             using (Graphics gr = Graphics.FromImage(newImage))
             {
@@ -128,7 +128,6 @@ namespace RemoteDisplayManager
                 gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 gr.DrawImage(img, new Rectangle(0, 0, newWidth, newHeight));
             }
-
             return (Image)newImage;
         }
 
@@ -152,11 +151,11 @@ namespace RemoteDisplayManager
         public static void SetStatus(string status)
         {
             IntPtr win_main = GetMXIEMainWindow();
-            //System.Windows.Activa
 
             Win32.SetForegroundWindow(win_main);
             System.Threading.Thread.Sleep(200);
 
+            System.Windows.Forms.SendKeys.Send("{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}");
             System.Windows.Forms.SendKeys.Send("{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}");
             System.Windows.Forms.SendKeys.Send(status);
             /*

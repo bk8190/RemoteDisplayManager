@@ -109,6 +109,8 @@ namespace RemoteDisplayManager
 
                     StatusCurrentTextBox.Text = newstatus;
                     setStatus(newstatus);
+
+                    MXIEScraper.SetStatus("Hello world");
                 }
                 catch (Exception ex)
                 {

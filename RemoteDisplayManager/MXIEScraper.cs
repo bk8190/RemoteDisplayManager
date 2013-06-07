@@ -49,28 +49,21 @@ namespace RemoteDisplayManager
 
         private static Process GetProcByName(string Name)
         {
-            Process proc = null;
-            Process[] processes = Process.GetProcesses();
-            for (int i = 0; i < processes.Length; i++)
-            {
-                //System.Console.WriteLine(processes[i].ProcessName);
-                if (processes[i].ProcessName == Name)
-                    proc = processes[i];
-            }
-            return proc;
+            foreach (var proc in Process.GetProcesses())
+                if (proc.ProcessName == Name)
+                    return proc;
+
+            throw new System.Exception("Could not find process");
         }
 
         private static IntPtr GetMXIEMainWindow()
         {
-            Process proc = GetProcByName("mxie");
-            if (proc == null)
-                throw new System.Exception("Could not find process");
-            IntPtr win_main = proc.MainWindowHandle;
-
+            IntPtr win_main = GetProcByName("mxie").MainWindowHandle;
             //IntPtr win_main = Win32.FindWindow(null, "MXIE User: wkulp");
 
             if (win_main == IntPtr.Zero)
                 throw new System.Exception("Null window");
+
             // Console.WriteLine("Top window = 0x" + win_main.ToString("X"));
             return win_main;
         }
@@ -93,12 +86,11 @@ namespace RemoteDisplayManager
                 child1 = Win32.FindWindowEx(win_main, child1, null, null);
             }
 
-            Console.WriteLine("Using: child1 = 0x" + child1.ToString("X"));
-            Console.WriteLine("Using: child2 = 0x" + child2.ToString("X"));
+            Console.WriteLine("child1 = 0x" + child1.ToString("X"));
+            Console.WriteLine("child2 = 0x" + child2.ToString("X"));
 
             if (child2 == IntPtr.Zero)
                 throw new System.Exception("Null child2");
-
             return child2;
         }
 
@@ -115,19 +107,19 @@ namespace RemoteDisplayManager
             var crop = new Rectangle(x0, y0, width, height);
 
             if (img.Width < x0+width || img.Height < y0+height)
-                throw new System.Exception("Image too small to crop");
+                throw new System.Exception("Image too small to crop (" + img.Width + "x" + img.Height + ")");
 
             img = img.Clone(crop, img.PixelFormat);
 
             // Resize it to help with OCR
             int newWidth  = (int)(img.Width  * 5);
             int newHeight = (int)(img.Height * 4);
-            Bitmap newImage = new Bitmap(newWidth, newHeight);
-            using (Graphics gr = Graphics.FromImage(newImage))
+            var newImage  = new Bitmap(newWidth, newHeight);
+            using (var gr = Graphics.FromImage(newImage))
             {
-                gr.SmoothingMode = SmoothingMode.HighQuality;
+                gr.SmoothingMode     = SmoothingMode.HighQuality;
                 gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                gr.PixelOffsetMode   = PixelOffsetMode.HighQuality;
                 gr.DrawImage(img, new Rectangle(0, 0, newWidth, newHeight));
             }
             return (Image)newImage;
@@ -173,8 +165,7 @@ namespace RemoteDisplayManager
             int length = Win32.SendMessage(hwnd, Win32.WM_GETTEXTLENGTH, 0, 0);
 
             // Retrieve that many characters
-            StringBuilder text = new StringBuilder();
-            text = new StringBuilder(length + 1);
+            var text = new StringBuilder(length + 1);
             int retr2 = Win32.SendMessage(hwnd, Win32.WM_GETTEXT, length + 1, text);
             if (retr2 != length)
                 throw new System.Exception("WM_GETTEXT returned " + retr2);
@@ -185,8 +176,7 @@ namespace RemoteDisplayManager
         public static String GetDialogText(IntPtr hwnd)
         {
             // Retrieve that many characters
-            StringBuilder text = new StringBuilder();
-            text = new StringBuilder(100);
+            var text = new StringBuilder(100);
 
             int ret = Win32.GetDlgItemText(hwnd, Win32.IDC_TEXT, text, 100);
 
@@ -217,8 +207,7 @@ namespace RemoteDisplayManager
             int length = Win32.SendMessage(child, Win32.WM_GETTEXTLENGTH, 0, 0);
 
             // Retrieve that many characters
-            StringBuilder text = new StringBuilder();
-            text = new StringBuilder(length + 1);
+            var text = new StringBuilder(length + 1);
             int retr2 = Win32.SendMessage(child, Win32.WM_GETTEXT, length + 1, text);
             if (retr2 != length)
                 throw new System.Exception("WM_GETTEXT returned " + retr2);
@@ -231,7 +220,7 @@ namespace RemoteDisplayManager
             IntPtr child = NotepadGetStatusControl();
 
             // Set the new text
-            StringBuilder text = new StringBuilder(status);
+            var text = new StringBuilder(status);
             int ret = Win32.SendMessage(child, Win32.WM_SETTEXT, status.Length, text);
             if (ret != 1)
                 throw new System.Exception("WM_SETTEXT returned " + ret);

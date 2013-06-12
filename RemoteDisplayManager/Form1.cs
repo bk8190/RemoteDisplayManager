@@ -19,9 +19,12 @@ namespace RemoteDisplayManager
         private bool connected;
         private string lastStatus;
         private DisplaySerialManager dsm;
+        private List<String> rawHistory;
 
         public Form1()
         {
+            rawHistory = new List<String>();
+
             connected = false;
             lastStatus = "";
             dsm = new DisplaySerialManager();
@@ -47,8 +50,10 @@ namespace RemoteDisplayManager
             {
                 try 
                 {
+                    Console.WriteLine("Opening \"" + serialPortBox.Text + "\"");
                     dsm.open(serialPortBox.Text);
                     connected = true;
+                    connectButton.Text = "Stop";
 
                     serialPortBox.Enabled = false;
                     button1.Enabled       = true;
@@ -67,33 +72,33 @@ namespace RemoteDisplayManager
                 serialPortBox.Enabled = true;
                 button1.Enabled       = false;
                 button2.Enabled       = false;
-                backlightBox.Enabled  = false;
+                backlightBox.Enabled = false;
+                connectButton.Text = "Connect";
 
                 dsm.close();
             }
         }
 
-
+        int lineno = 0;
         private void serialTimerCallback(object sender, EventArgs e)
         {
             if (connected)
             {
                 dsm.update();
                 
-                String raw = dsm.getRaw().Replace("\r", "");
+                String raw = dsm.getRaw();
                 if (raw.Length > 0)
                 {
-                    Console.WriteLine("Raw: %" + raw + "%");
-                    String current = rawResponsesTextBox.Text.Replace("\r", "");
-                    List<String> text = new List<String>(current.Split('\n'));
-                    
-                    foreach (var line in raw.Split('\n'))
-                        text.Add(line);
+                    char[] delims = new char[] { '\r', '\n' };
+                    foreach (var line in raw.Split(delims, StringSplitOptions.RemoveEmptyEntries))
+                        rawHistory.Add("" + (lineno++) + ": " + line);
 
-                    while (text.Count > 10)
-                        text.RemoveAt(0);
+                    for (int i = 0; i < rawHistory.Count - 10; i++)
+                        rawHistory.RemoveAt(0);
 
-                    rawResponsesTextBox.Text = String.Join("\n\r", text);
+                    rawResponsesTextBox.Text = String.Join("\r\n", rawHistory);
+                    rawResponsesTextBox.SelectionStart = rawResponsesTextBox.Text.Length;
+                    rawResponsesTextBox.ScrollToCaret();
                 }
 
                 if (dsm.responses.Count > 0)
@@ -104,8 +109,6 @@ namespace RemoteDisplayManager
                     connectedBox.Checked = true;
                     connectionTimeoutTimer.Stop();
                     connectionTimeoutTimer.Start();
-
-
                     switch (s[0])
                     {
                         case 's':
@@ -138,7 +141,6 @@ namespace RemoteDisplayManager
                             rawResponsesTextBox.Text += s + "\r\n";
                             break;
                     }
-
                 }
             }
         }

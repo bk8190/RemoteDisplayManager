@@ -203,7 +203,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 449);
+            this.ClientSize = new System.Drawing.Size(290, 449);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.mxiePicture);
             this.Controls.Add(this.connectedBox);

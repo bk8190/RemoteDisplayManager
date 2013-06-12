@@ -208,6 +208,7 @@ namespace RemoteDisplayManager
             System.Threading.Thread.Sleep(200);
 
             System.Windows.Forms.SendKeys.Send("{BS 30}{DEL 30}" + status + "{TAB}");
+            System.Threading.Thread.Sleep(200);
             Win32.SetCursorPos(oldx, oldy);
         }
 

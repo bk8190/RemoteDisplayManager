@@ -44,6 +44,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.mxiePicture = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.pingTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.mxiePicture)).BeginInit();
             this.SuspendLayout();
             // 
@@ -69,7 +70,7 @@
             // serialTimer
             // 
             this.serialTimer.Enabled = true;
-            this.serialTimer.Interval = 200;
+            this.serialTimer.Interval = 1000;
             this.serialTimer.Tick += new System.EventHandler(this.serialTimerCallback);
             // 
             // textBox1
@@ -131,6 +132,8 @@
             // mxieCheckBox
             // 
             this.mxieCheckBox.AutoSize = true;
+            this.mxieCheckBox.Checked = true;
+            this.mxieCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.mxieCheckBox.Location = new System.Drawing.Point(12, 43);
             this.mxieCheckBox.Name = "mxieCheckBox";
             this.mxieCheckBox.Size = new System.Drawing.Size(104, 21);
@@ -153,13 +156,13 @@
             // mxieTimer
             // 
             this.mxieTimer.Enabled = true;
-            this.mxieTimer.Interval = 1000;
+            this.mxieTimer.Interval = 10000;
             this.mxieTimer.Tick += new System.EventHandler(this.mxieTimerCallback);
             // 
             // connectionTimeoutTimer
             // 
             this.connectionTimeoutTimer.Enabled = true;
-            this.connectionTimeoutTimer.Interval = 15000;
+            this.connectionTimeoutTimer.Interval = 30000;
             this.connectionTimeoutTimer.Tick += new System.EventHandler(this.connectedTimerCallback);
             // 
             // button2
@@ -190,6 +193,11 @@
             this.label1.Size = new System.Drawing.Size(65, 17);
             this.label1.TabIndex = 10;
             this.label1.Text = "Backlight";
+            // 
+            // pingTimer
+            // 
+            this.pingTimer.Interval = 15000;
+            this.pingTimer.Tick += new System.EventHandler(this.pingTimerCallback);
             // 
             // Form1
             // 
@@ -233,6 +241,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.PictureBox mxiePicture;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Timer pingTimer;
     }
 }
 

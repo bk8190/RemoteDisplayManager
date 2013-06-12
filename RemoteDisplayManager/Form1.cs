@@ -73,6 +73,23 @@ namespace RemoteDisplayManager
             if (connected)
             {
                 dsm.update();
+                
+                String raw = dsm.getRaw().Replace("\r", "");
+                if (raw.Length > 0)
+                {
+                    Console.WriteLine("Raw: %" + raw + "%");
+                    String current = rawResponsesTextBox.Text.Replace("\r", "");
+                    List<String> text = new List<String>(current.Split('\n'));
+                    
+                    foreach (var line in raw.Split('\n'))
+                        text.Add(line);
+
+                    while (text.Count > 10)
+                        text.RemoveAt(0);
+
+                    rawResponsesTextBox.Text = String.Join("\n\r", text);
+                }
+
                 if (dsm.responses.Count > 0)
                 {
                     String s = (String)dsm.responses.Dequeue();
@@ -82,19 +99,27 @@ namespace RemoteDisplayManager
                     connectionTimeoutTimer.Stop();
                     connectionTimeoutTimer.Start();
 
+
                     switch (s[0])
                     {
-                        case 'e':
-                            Console.WriteLine("Got ping");
-                            break;
+                        case 's':
+                            String status = "_" + s.Substring(1);
+                            Console.WriteLine("Set status: \"" + status + "\"");
 
-                        case 'u':
-                            String status = s.Substring(1);
-                            Console.WriteLine("Got: set status \"" + status + "\"");
+                            mxieTimer.Stop();
 
                             MXIEScraper.SetStatus(status);
-                            lastStatus = getStatusFromMXIE();
-                            Console.WriteLine("After OCR, new status is \"" + lastStatus + "\"");
+                            System.Threading.Thread.Sleep(500);
+
+                            var tmp = getStatusFromMXIE();
+                            tmp = getStatusFromMXIE();
+                            Console.WriteLine("After OCR, new status is \"" + tmp + "\"");
+
+                            if (mxieCheckBox.Checked)
+                            {
+                                mxieTimerCallback(null, null);
+                                mxieTimer.Start();
+                            }
                             break;
 
                         case 'h':
@@ -107,6 +132,7 @@ namespace RemoteDisplayManager
                             rawResponsesTextBox.Text += s + "\r\n";
                             break;
                     }
+
                 }
             }
         }
@@ -125,7 +151,12 @@ namespace RemoteDisplayManager
             {
                 try
                 {
-                    setStatus(getStatusFromMXIE());
+                    String s = getStatusFromMXIE();
+                    if (s != lastStatus)
+                    {
+                        Console.WriteLine("MXIE: <" + s + ">");
+                        setStatus(s);
+                    }
                     //MXIEScraper.SetStatus("Hello world");
                 }
                 catch (Exception ex)
@@ -138,7 +169,7 @@ namespace RemoteDisplayManager
 
         private void setStatus(String newstatus)
         {
-            //if (connected)
+            if (connected)
             {
                 if (newstatus != lastStatus)
                 {
@@ -146,7 +177,7 @@ namespace RemoteDisplayManager
                     StatusCurrentTextBox.Text = newstatus;
 
                     var cmd = Commands.SetTextCompositeCommand(newstatus);
-                    //dsm.write(cmd);
+                    dsm.write(cmd);
                 }
             }
         }
@@ -172,6 +203,12 @@ namespace RemoteDisplayManager
         private void sendRawButtonClick(object sender, EventArgs e)
         {
             dsm.write(textBox1.Text);
+        }
+
+        private void pingTimerCallback(object sender, EventArgs e)
+        {
+            Console.WriteLine("Sending ping");
+            dsm.write(Commands.PingCommand());
         }
     }
 }

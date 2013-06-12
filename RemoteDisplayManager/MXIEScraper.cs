@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 
 
 namespace RemoteDisplayManager
@@ -16,6 +17,15 @@ namespace RemoteDisplayManager
     {
         private class Win32
         {
+            [StructLayout(LayoutKind.Sequential)]
+            public struct RECT
+            {
+                public int Left;        // x position of upper-left corner
+                public int Top;         // y position of upper-left corner
+                public int Right;       // x position of lower-right corner
+                public int Bottom;      // y position of lower-right corner
+            }
+
             [DllImport("User32.dll")]
             public static extern IntPtr FindWindow(String lpClassName, String lpWindowName);
             [DllImport("user32.dll")]
@@ -30,6 +40,22 @@ namespace RemoteDisplayManager
             //public static extern Int32 GetWindowTextLength(int hwnd);
             //[DllImport("user32.dll", EntryPoint = "GetDesktopWindow")]
             //public static extern int GetDesktopWindow();
+            [DllImport("user32.dll")]
+            public static extern void mouse_event(uint dwFlags, int dx, int dy, uint cButtons, uint dwExtraInfo);
+
+            [DllImport("user32.dll", EntryPoint = "SetCursorPos")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool SetCursorPos(int X, int Y);    
+
+            public const int MOUSEEVENTF_ABSOULUTE = 0x8000;
+            public const int MOUSEEVENTF_LEFTDOWN = 0x02;
+            public const int MOUSEEVENTF_LEFTUP = 0x04;
+            public const int MOUSEEVENTF_RIGHTDOWN = 0x08;
+            public const int MOUSEEVENTF_RIGHTUP = 0x10;
+
+            [DllImport("user32.dll")]
+            public static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
 
             [DllImport("user32.dll")]
             public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
@@ -143,20 +169,25 @@ namespace RemoteDisplayManager
 
         public static void SetStatus(string status)
         {
+            int oldx = Cursor.Position.X;
+            int oldy = Cursor.Position.Y;
+
             IntPtr win_main = GetMXIEMainWindow();
             Win32.SetForegroundWindow(win_main);
             System.Threading.Thread.Sleep(200);
 
-            System.Windows.Forms.SendKeys.Send("{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}");
-            System.Windows.Forms.SendKeys.Send("{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}{BS}");
-            System.Windows.Forms.SendKeys.Send(status);
-            /*
-            // Set the new text
-            StringBuilder text = new StringBuilder(status);
-            int ret = Win32.SendMessage(child, Win32.WM_SETTEXT, status.Length, text);
-            if (ret != 1)
-                throw new System.Exception("WM_SETTEXT returned " + ret);
-             */
+            Win32.RECT r;
+            Win32.GetWindowRect(win_main, out r);
+            int x = r.Left + 120;
+            int y = r.Top + 112;
+
+            Win32.SetCursorPos(x, y);
+            System.Threading.Thread.Sleep(200);
+            Win32.mouse_event(Win32.MOUSEEVENTF_LEFTDOWN | Win32.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+            System.Threading.Thread.Sleep(200);
+
+            System.Windows.Forms.SendKeys.Send("{BS 30}{DEL 30}" + status + "{TAB}");
+            Win32.SetCursorPos(oldx, oldy);
         }
 
         public static String GetWindowText(IntPtr hwnd)

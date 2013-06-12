@@ -52,7 +52,7 @@ namespace RemoteDisplayManager
 
         public static String PingCommand()
         {
-            return "<e>";
+            return "<h>";
         }
 
         public static String SetTextCompositeCommand(String status)
@@ -70,7 +70,7 @@ namespace RemoteDisplayManager
                 if (word == "")
                     continue;
 
-                Console.WriteLine("word: <" + word + ">");
+                //Console.WriteLine("word: <" + word + ">");
                 if (result[idx].Length + word.Length + 1 <= 16)
                 {
                     if (result[idx].Length > 0)
@@ -86,18 +86,18 @@ namespace RemoteDisplayManager
 
             if (result.Count > 0)
             {
-                Console.WriteLine("Line 0: <" + result[0] + ">");
+                //Console.WriteLine("Line 0: <" + result[0] + ">");
                 output += Commands.QuickTextCommand(result[0]);
 
                 if (result.Count > 1)
                 {
-                    Console.WriteLine("Line 1: <" + result[1] + ">");
+                    //Console.WriteLine("Line 1: <" + result[1] + ">");
                     output += Commands.TextCommand(result[1], 1);
                 }
             }
             else
             {
-                Console.WriteLine("Clearing");
+                //Console.WriteLine("Clearing");
                 output += Commands.ClearCommand();
             }
             Console.WriteLine("Composite command: " + output);
@@ -110,6 +110,7 @@ namespace RemoteDisplayManager
         private SerialPort serialPort;
         private bool got_start_delim;
         private string incomplete_string;
+        private string raw;
 
         public Queue responses;
 
@@ -118,6 +119,7 @@ namespace RemoteDisplayManager
             got_start_delim = false;
             incomplete_string = "";
             responses = new Queue();
+            raw = "";
 
             serialPort = new SerialPort();
             serialPort.BaudRate = 57600;
@@ -143,13 +145,21 @@ namespace RemoteDisplayManager
             serialPort.WriteLine(s);
         }
 
+        public String getRaw()
+        {
+            var tmp = raw;
+            raw = "";
+            return tmp;
+        }
+
         public void update()
         {
             string input = serialPort.ReadExisting();
 
             if (input.Length > 0)
             {
-                //System.Console.WriteLine("Raw: %" + input + "%");
+                System.Console.WriteLine("Raw: %" + input + "%");
+                raw = raw + input;
             }
 
             foreach (char c in input)

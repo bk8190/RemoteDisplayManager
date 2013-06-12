@@ -27,6 +27,11 @@ namespace RemoteDisplayManager
 
             InitializeComponent();
             portBoxDropDown(null, null);
+
+            try{
+                MXIEScraper.SetMXIETopmost();
+            }catch (Exception e){
+            }
         }
 
         private void portBoxDropDown(object sender, EventArgs e)

@@ -32,6 +32,17 @@ namespace RemoteDisplayManager
             public static extern IntPtr FindWindowEx(IntPtr Parent, IntPtr child, string classname, string WindowTitle);
             [DllImport("User32.dll")]
             public static extern Int32 SetForegroundWindow(IntPtr hWnd);
+            [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+            public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
+
+            public const int HWND_TOPMOST = -1;
+            public const int SWP_NOMOVE = 0x0002;
+            public const int SWP_NOSIZE = 0x0001;
+
+            [DllImport("user32.dll")]
+            public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+            public const int SW_RESTORE = 9;
+
             //[DllImport("User32.dll")]
             //public static extern Boolean EnumChildWindows(int hWndParent, Delegate lpEnumFunc, int lParam);
             //[DllImport("User32.dll")]
@@ -167,14 +178,24 @@ namespace RemoteDisplayManager
             return System.IO.File.ReadAllText(@"C:\Windows\Temp\mxietext.txt");
         }
 
+        public static void SetMXIETopmost()
+        {
+            IntPtr win_main = GetMXIEMainWindow();
+            Win32.SetForegroundWindow(win_main);
+            System.Threading.Thread.Sleep(200);
+            Win32.SetWindowPos(win_main, Win32.HWND_TOPMOST, 0, 0, 0, 0, Win32.SWP_NOMOVE | Win32.SWP_NOSIZE);
+        }
+
         public static void SetStatus(string status)
         {
             int oldx = Cursor.Position.X;
             int oldy = Cursor.Position.Y;
 
             IntPtr win_main = GetMXIEMainWindow();
+            Win32.ShowWindow(win_main, Win32.SW_RESTORE);
             Win32.SetForegroundWindow(win_main);
             System.Threading.Thread.Sleep(200);
+            Win32.SetWindowPos(win_main, Win32.HWND_TOPMOST, 0, 0, 0, 0, Win32.SWP_NOMOVE | Win32.SWP_NOSIZE);
 
             Win32.RECT r;
             Win32.GetWindowRect(win_main, out r);

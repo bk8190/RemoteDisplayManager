@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Management;
 
 namespace RemoteDisplayManager
 {
@@ -36,8 +37,8 @@ namespace RemoteDisplayManager
 
         private void portBoxDropDown(object sender, EventArgs e)
         {
-            var ports = SerialPort.GetPortNames();
-            serialPortBox.DataSource = ports;
+            var portnames1 = SerialPort.GetPortNames();
+            serialPortBox.DataSource = portnames1;
         }
 
         private void connectButtonClicked(object sender, EventArgs e)
